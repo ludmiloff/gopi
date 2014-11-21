@@ -1,14 +1,14 @@
 // +build !appengine
 
-package goji
+package gopi
 
 import (
 	"flag"
 	"log"
 	"net/http"
 
-	"github.com/zenazn/goji/bind"
-	"github.com/zenazn/goji/graceful"
+	"github.com/ludmiloff/gopi/bind"
+	"github.com/ludmiloff/gopi/graceful"
 )
 
 func init() {

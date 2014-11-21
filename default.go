@@ -1,8 +1,8 @@
-package goji
+package gopi
 
 import (
-	"github.com/zenazn/goji/web"
-	"github.com/zenazn/goji/web/middleware"
+	"github.com/ludmiloff/gooi/web"
+	"github.com/ludmiloff/gopi/web/middleware"
 )
 
 // The default web.Mux.
