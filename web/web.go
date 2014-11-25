@@ -104,6 +104,12 @@ type C struct {
 	// and other handlers using this map, and are even more strongly
 	// encouraged to document and maybe namespace the keys they use.
 	Env map[string]interface{}
+
+	// Default response writer
+	W http.ResponseWriter
+
+	// Current request
+	Request *http.Request
 }
 
 // Handler is a superset of net/http's http.Handler, which also includes a
@@ -125,4 +131,17 @@ func (h HandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // ServeHTTPC wraps ServeHTTP with a context parameter.
 func (h HandlerFunc) ServeHTTPC(c C, w http.ResponseWriter, r *http.Request) {
 	h(c, w, r)
+}
+
+// Controller hander function
+type ControllerHandlerFunc func(C)
+
+func (h ControllerHandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h(C{W: w, Request: r})
+}
+
+func (h ControllerHandlerFunc) ServeHTTPC(c C, w http.ResponseWriter, r *http.Request) {
+	c.W = w
+	c.Request = r
+	h(c)
 }

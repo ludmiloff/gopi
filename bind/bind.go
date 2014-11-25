@@ -24,7 +24,6 @@ calling net.Listen() the old-fashioned way.
 package bind
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -46,35 +45,22 @@ func init() {
 // function before flags are parsed, for example in an init() block.
 //
 // When selecting the default bind string, this function will examine its
-// environment for hints about what port to bind to, selecting the GOJI_BIND
+// environment for hints about what port to bind to, selecting the GOPI_BIND
 // environment variable, Einhorn, systemd, the PORT environment variable, and
 // the port 8000, in order. In most cases, this means that the default behavior
 // of the default socket will be reasonable for use in your circumstance.
-func WithFlag() {
-	defaultBind := ":8000"
-	if s := Sniff(); s != "" {
-		defaultBind = s
-	}
-	flag.StringVar(&bind, "bind", defaultBind,
-		`Address to bind on. If this value has a colon, as in ":8000" or
-		"127.0.0.1:9001", it will be treated as a TCP address. If it
-		begins with a "/" or a ".", it will be treated as a path to a
-		UNIX socket. If it begins with the string "fd@", as in "fd@3",
-		it will be treated as a file descriptor (useful for use with
-		systemd, for instance). If it begins with the string "einhorn@",
-		as in "einhorn@0", the corresponding einhorn socket will be
-		used. If an option is not explicitly passed, the implementation
-		will automatically select among "einhorn@0" (Einhorn), "fd@3"
-		(systemd), and ":8000" (fallback) based on its environment.`)
+func WithFlag(flag string) {
+
+	bind = flag
 }
 
 // Sniff attempts to select a sensible default bind string by examining its
-// environment. It examines the GOJI_BIND environment variable, Einhorn,
+// environment. It examines the GOPI_BIND environment variable, Einhorn,
 // systemd, and the PORT environment variable, in that order, selecting the
 // first plausible option. It returns the empty string if no sensible default
 // could be extracted from the environment.
 func Sniff() string {
-	if bind := os.Getenv("GOJI_BIND"); bind != "" {
+	if bind := os.Getenv("GOPI_BIND"); bind != "" {
 		return bind
 	} else if usingEinhorn() {
 		return "einhorn@0"

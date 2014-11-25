@@ -131,8 +131,8 @@ func TestHandlerTypes(t *testing.T) {
 // applied in the right order. We define a special pattern type that always
 // matches so long as it's greater than or equal to the global test index. By
 // incrementing this index, we can invalidate all routes up to some point, and
-// therefore test the routing guarantee that Goji provides: for any path P, if
-// both A and B match P, and if A was inserted before B, then Goji will route to
+// therefore test the routing guarantee that Gopi provides: for any path P, if
+// both A and B match P, and if A was inserted before B, then Gopi will route to
 // A before it routes to B.
 var rsRoutes = []string{
 	"/",

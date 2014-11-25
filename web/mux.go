@@ -211,7 +211,7 @@ func (m *Mux) Trace(pattern interface{}, handler interface{}) {
 // Set the fallback (i.e., 404) handler for this mux. See the documentation for
 // type Mux for a description of what types are accepted for handler.
 //
-// As a convenience, the context environment variable "goji.web.validMethods"
+// As a convenience, the context environment variable "gopi.web.validMethods"
 // (also available as the constant ValidMethodsKey) will be set to the list of
 // HTTP methods that could have been routed had they been provided on an
 // otherwise identical request.

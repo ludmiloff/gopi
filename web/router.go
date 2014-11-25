@@ -30,7 +30,7 @@ const (
 
 // The key used to communicate to the NotFound handler what methods would have
 // been allowed if they'd been provided.
-const ValidMethodsKey = "goji.web.validMethods"
+const ValidMethodsKey = "gopi.web.validMethods"
 
 var validMethodsMap = map[string]method{
 	"CONNECT": mCONNECT,
@@ -78,6 +78,8 @@ func parseHandler(h interface{}) Handler {
 		return HandlerFunc(f)
 	case func(w http.ResponseWriter, r *http.Request):
 		return netHTTPWrap{http.HandlerFunc(f)}
+	case func(c C):
+		return ControllerHandlerFunc(f)
 	default:
 		log.Fatalf("Unknown handler type %v. Expected a web.Handler, "+
 			"a http.Handler, or a function with signature func(C, "+

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/zenazn/goji/web"
+	"github.com/ludmiloff/gopi/web"
 )
 
 // Key to use when setting the request ID.

@@ -13,7 +13,7 @@ The core benchmarks here are based on cypriss's mux benchmarks, which can be
 found here:
 https://github.com/cypriss/golang-mux-benchmark
 
-They happen to play very well into Goji's router's strengths.
+They happen to play very well into Gopi's router's strengths.
 */
 
 type nilRouter struct{}

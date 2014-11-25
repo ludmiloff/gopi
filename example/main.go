@@ -1,5 +1,5 @@
-// Command example is a sample application built with Goji. Its goal is to give
-// you a taste for what Goji looks like in the real world by artificially using
+// Command example is a sample application built with Gopi. Its goal is to give
+// you a taste for what Gopi looks like in the real world by artificially using
 // all of its features.
 //
 // In particular, this is a complete working site for gritter.com, a site where
@@ -15,38 +15,38 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/goji/param"
-	"github.com/zenazn/goji"
-	"github.com/zenazn/goji/web"
-	"github.com/zenazn/goji/web/middleware"
+	"github.com/gopi/param"
+	"github.com/ludmiloff/gopi"
+	"github.com/ludmiloff/gopi/web"
+	"github.com/ludmiloff/gopi/web/middleware"
 )
 
 // Note: the code below cuts a lot of corners to make the example app simple.
 
 func main() {
 	// Add routes to the global handler
-	goji.Get("/", Root)
+	gopi.Get("/", Root)
 	// Fully backwards compatible with net/http's Handlers
-	goji.Get("/greets", http.RedirectHandler("/", 301))
+	gopi.Get("/greets", http.RedirectHandler("/", 301))
 	// Use your favorite HTTP verbs
-	goji.Post("/greets", NewGreet)
+	gopi.Post("/greets", NewGreet)
 	// Use Sinatra-style patterns in your URLs
-	goji.Get("/users/:name", GetUser)
-	// Goji also supports regular expressions with named capture groups.
-	goji.Get(regexp.MustCompile(`^/greets/(?P<id>\d+)$`), GetGreet)
+	gooi.Get("/users/:name", GetUser)
+	// Gopi also supports regular expressions with named capture groups.
+	gopi.Get(regexp.MustCompile(`^/greets/(?P<id>\d+)$`), GetGreet)
 
 	// Middleware can be used to inject behavior into your app. The
 	// middleware for this application are defined in middleware.go, but you
 	// can put them wherever you like.
-	goji.Use(PlainText)
+	gopi.Use(PlainText)
 
 	// If the patterns ends with "/*", the path is treated as a prefix, and
 	// can be used to implement sub-routes.
 	admin := web.New()
-	goji.Handle("/admin/*", admin)
+	gopi.Handle("/admin/*", admin)
 
 	// The standard SubRouter middleware helps make writing sub-routers
-	// easy. Ordinarily, Goji does not manipulate the request's URL.Path,
+	// easy. Ordinarily, Gopi does not manipulate the request's URL.Path,
 	// meaning you'd have to repeat "/admin/" in each of the following
 	// routes. This middleware allows you to cut down on the repetition by
 	// eliminating the shared, already-matched prefix.
@@ -59,22 +59,22 @@ func main() {
 	admin.Get("/", AdminRoot)
 	admin.Get("/finances", AdminFinances)
 
-	// Goji's routing, like Sinatra's, is exact: no effort is made to
+	// Gopi's routing, like Sinatra's, is exact: no effort is made to
 	// normalize trailing slashes.
-	goji.Get("/admin", http.RedirectHandler("/admin/", 301))
+	gopi.Get("/admin", http.RedirectHandler("/admin/", 301))
 
 	// Use a custom 404 handler
-	goji.NotFound(NotFound)
+	gopi.NotFound(NotFound)
 
 	// Sometimes requests take a long time.
-	goji.Get("/waitforit", WaitForIt)
+	gopi.Get("/waitforit", WaitForIt)
 
 	// Call Serve() at the bottom of your main() function, and it'll take
 	// care of everything else for you, including binding to a socket (with
 	// automatic support for systemd and Einhorn) and supporting graceful
 	// shutdown on SIGINT. Serve() is appropriate for both development and
 	// production.
-	goji.Serve()
+	gopi.Serve()
 }
 
 // Root route (GET "/"). Print a list of greets.
