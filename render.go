@@ -32,6 +32,8 @@ const (
 	defaultCharset = "UTF-8"
 )
 
+type RenderArgs map[string]interface{}
+
 // Included helper functions for use when rendering html.
 var renderHelperFuncs = template.FuncMap{
 	"yield": func() (string, error) {
@@ -59,7 +61,7 @@ type RenderOptions struct {
 	// Extensions to parse template files from. Defaults to [".tmpl"].
 	Extensions []string
 	// Funcs is a slice of FuncMaps to apply to the template upon compilation. This is useful for helper functions. Defaults to [].
-	Funcs []template.FuncMap
+	Funcs template.FuncMap
 	// Delims sets the action delimiters to the specified strings in the Delims struct.
 	Delims RenderDelims
 	// Appends the given character set to the Content-Type header. Default is "UTF-8".
@@ -137,7 +139,7 @@ type Render struct {
 
 // Initialize HTML struct
 func NewHTML(title string) *HTML {
-	h := &HTML{Title: title}
+	h := &HTML{PageTitle: title}
 	return h
 }
 
@@ -208,9 +210,11 @@ func (r *Render) compileTemplates() {
 				tmpl := r.templates.New(filepath.ToSlash(name))
 
 				// Add our funcmaps.
-				for _, funcs := range r.opt.Funcs {
-					tmpl.Funcs(funcs)
-				}
+				// for _, funcs := range r.opt.Funcs {
+				// 	tmpl.Funcs(funcs)
+				// }
+
+				tmpl.Funcs(r.opt.Funcs)
 
 				// Break out if this parsing fails. We don't want any silent server starts.
 				template.Must(tmpl.Funcs(renderHelperFuncs).Parse(string(buf)))
@@ -279,6 +283,7 @@ func (r *Render) RenderHTML(w http.ResponseWriter, status int, name string, bind
 
 	// Assign a layout if there is one.
 	if len(opt.Layout) > 0 {
+		log.Println("USE YIELD")
 		r.addYield(name, binding)
 		name = opt.Layout
 	}
@@ -313,6 +318,11 @@ func (r *Render) addYield(name string, binding interface{}) {
 		"current": func() (string, error) {
 			return name, nil
 		},
+
+		// "set": func(renderArgs map[string]interface{}, key string, value interface{}) template.JS {
+		// 	renderArgs[key] = value
+		// 	return template.JS("")
+		// },
 	}
 	r.templates.Funcs(funcs)
 }
