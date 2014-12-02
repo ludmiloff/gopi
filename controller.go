@@ -7,8 +7,7 @@ import (
 )
 
 type Controller struct {
-	Layout    string
-	PageTitle string
+	Layout string
 }
 
 func (this *Controller) Redirect(c web.C, urlStr string, code int) {

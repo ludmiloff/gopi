@@ -2,7 +2,7 @@ package gopi
 
 import (
 	"bytes"
-	"fmt"
+	//"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -35,12 +35,27 @@ const (
 type RenderArgs map[string]interface{}
 
 // Included helper functions for use when rendering html.
-var renderHelperFuncs = template.FuncMap{
-	"yield": func() (string, error) {
-		return "", fmt.Errorf("yield called with no layout defined")
+var TemplateFunctions = template.FuncMap{
+	"set": func(renderArgs map[string]interface{}, key string, value interface{}) interface{} {
+		renderArgs[key] = value
+		return nil
 	},
-	"current": func() (string, error) {
-		return "", nil
+
+	"append": func(renderArgs map[string]interface{}, key string, value interface{}) interface{} {
+		if renderArgs[key] == nil {
+			renderArgs[key] = []interface{}{value}
+		} else {
+			renderArgs[key] = append(renderArgs[key].([]interface{}), value)
+		}
+		return nil
+	},
+
+	"param": func(key string) template.HTML {
+		if val, ok := App.Params[key]; ok {
+			return template.HTML(template.HTMLEscapeString(val))
+		} else {
+			return ""
+		}
 	},
 }
 
@@ -216,8 +231,12 @@ func (r *Render) compileTemplates() {
 
 				tmpl.Funcs(r.opt.Funcs)
 
+				text := string(buf)
+				text = strings.Replace(text, "}}\n\n", "}}", -1)
+				text = strings.Replace(text, "}}\n", "}}", -1)
+
 				// Break out if this parsing fails. We don't want any silent server starts.
-				template.Must(tmpl.Funcs(renderHelperFuncs).Parse(string(buf)))
+				template.Must(tmpl.Funcs(TemplateFunctions).Parse(text))
 				break
 			}
 		}

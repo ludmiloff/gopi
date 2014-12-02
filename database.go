@@ -24,7 +24,7 @@ func (this *Application) InitDB() {
 
 func GetDB(user, password, hostname, port, database, encoding, engine string) *gorp.DbMap {
 	db, err := sql.Open("mysql", fmt.Sprint(user, ":", password, "@(", hostname, ":", port, ")/", database, "?charset=", encoding))
-	checkErr(err, "sql.Open failed")
+	CheckErr(err, "sql.Open failed")
 
 	dbMap := &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{engine, strings.ToUpper(encoding)}}
 
@@ -33,14 +33,14 @@ func GetDB(user, password, hostname, port, database, encoding, engine string) *g
 
 func GetDBSimple(dsn, engine, encoding string) *gorp.DbMap {
 	db, err := sql.Open("mysql", dsn)
-	checkErr(err, "sql.Open failed")
+	CheckErr(err, "sql.Open failed")
 
 	dbMap := &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{engine, strings.ToUpper(encoding)}}
 
 	return dbMap
 }
 
-func checkErr(err error, msg string) {
+func CheckErr(err error, msg string) {
 	if err != nil {
 		log.Fatalln(msg, err)
 	}

@@ -3,28 +3,17 @@ package gopi
 import (
 	"github.com/pelletier/go-toml"
 	"html/template"
-	"log"
+	// "log"
 )
 
-func templateFunctions() template.FuncMap {
-	funcs := template.FuncMap{
-		"set": func(renderArgs map[string]interface{}, key string, value interface{}) interface{} {
-			renderArgs[key] = value
-			return nil
-		},
-	}
-
-	return funcs
-}
-
-func (this *Application) InitRender() {
+func (this *Application) InitRender(userFuncs template.FuncMap) {
 	general := this.Config.Get("general").(*toml.TomlTree)
 	//log.Println("TEMPLATE PATH", general.Get("template_path"))
 	this.Render = NewRender(RenderOptions{
 		Directory:       general.GetDefault("template_path", "templates").(string),
 		Layout:          "layout",
 		Extensions:      []string{".tmpl", ".html"},
-		Funcs:           templateFunctions(),
+		Funcs:           userFuncs,
 		Delims:          RenderDelims{"{{", "}}"},
 		Charset:         "UTF-8",
 		IndentJSON:      true,

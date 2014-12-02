@@ -5,7 +5,9 @@ package gopi
 import (
 	"flag"
 	"github.com/coopernurse/gorp"
+	"github.com/gorilla/sessions"
 	"github.com/pelletier/go-toml"
+	"html/template"
 
 	"log"
 	"net/http"
@@ -17,13 +19,19 @@ import (
 )
 
 type Application struct {
-	DefaultMux *web.Mux
-	Config     *toml.TomlTree
-	DB         *gorp.DbMap
-	Render     *Render
+	DefaultMux  *web.Mux
+	Config      *toml.TomlTree
+	DB          *gorp.DbMap
+	Session     *sessions.FilesystemStore
+	CookieStore *sessions.CookieStore
+	Render      *Render
+	Language    string
 
 	//
 	ShutdownFunc func()
+
+	// Application wide parameters
+	Params map[string]string
 }
 
 var App *Application
@@ -80,11 +88,27 @@ func CreateAppliction() *Application {
 	// This allows packages like expvar to continue working as expected.
 	http.Handle("/", app.DefaultMux)
 
+	// Static files
+	// Setup static files
+	static := web.New()
+	publicPath := app.Config.Get("general.public_path").(string)
+	static.Get("/assets/*", http.StripPrefix("/assets/", http.FileServer(http.Dir(publicPath))))
+	http.Handle("/assets/", static)
+
 	// Template renderer
-	app.InitRender()
+	app.InitRender(template.FuncMap{})
 
 	// Database
 	app.InitDB()
+
+	// Cookies
+	app.InitCookies()
+
+	// File system session store
+	app.InitSessionStore()
+
+	// Parameters
+	app.Params = map[string]string{}
 
 	graceful.HandleSignals()
 	bind.Ready()
