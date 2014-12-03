@@ -5,6 +5,8 @@ import ()
 func init() {
 }
 
+// DefaultMux actions
+
 // Use appends the given middleware to the default Mux's middleware stack. See
 // the documentation for web.Mux.Use for more information.
 func (this *Application) Use(middleware interface{}) {

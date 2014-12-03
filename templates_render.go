@@ -211,7 +211,7 @@ func (r *Render) compileTemplates() {
 			ext = "." + strings.Join(strings.Split(rel, ".")[1:], ".")
 		}
 
-		log.Println("TEMPLATE ", path)
+		//log.Println("TEMPLATE ", path)
 
 		for _, extension := range r.opt.Extensions {
 			if ext == extension {
