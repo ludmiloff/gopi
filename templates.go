@@ -21,6 +21,6 @@ func (this *Application) InitRender(userFuncs template.FuncMap) {
 		PrefixJSON:      []byte(")]}',\n"),
 		PrefixXML:       []byte("<?xml version='1.0' encoding='UTF-8'?>"),
 		HTMLContentType: ContentHTML,
-		IsDevelopment:   true,
+		IsDevelopment:   general.GetDefault("development", true).(bool),
 	})
 }

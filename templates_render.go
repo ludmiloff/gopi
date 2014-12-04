@@ -34,31 +34,6 @@ const (
 
 type RenderArgs map[string]interface{}
 
-// Included helper functions for use when rendering html.
-var TemplateFunctions = template.FuncMap{
-	"set": func(renderArgs map[string]interface{}, key string, value interface{}) interface{} {
-		renderArgs[key] = value
-		return nil
-	},
-
-	"append": func(renderArgs map[string]interface{}, key string, value interface{}) interface{} {
-		if renderArgs[key] == nil {
-			renderArgs[key] = []interface{}{value}
-		} else {
-			renderArgs[key] = append(renderArgs[key].([]interface{}), value)
-		}
-		return nil
-	},
-
-	"param": func(key string) template.HTML {
-		if val, ok := App.Params[key]; ok {
-			return template.HTML(template.HTMLEscapeString(val))
-		} else {
-			return ""
-		}
-	},
-}
-
 // Delims represents a set of Left and Right delimiters for HTML template rendering.
 type RenderDelims struct {
 	// Left delimiter, defaults to {{.
