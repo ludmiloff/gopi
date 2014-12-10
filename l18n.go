@@ -1,5 +1,5 @@
 package gopi
 
-func (this *Application) InitLocalization() {
+func (this *Application) InitL18N() {
 
 }

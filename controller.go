@@ -10,16 +10,14 @@ type Controller struct {
 	Layout string
 }
 
-func (this *Controller) BeforeRender(c web.C) {
-
-}
-
 func (this *Controller) SaveSession(c web.C) {
-	session, _ := App.CookieStore.Get(c.Request, "session")
-	err := session.Save(c.Request, c.W)
+	cookies, _ := App.CookieStore.Get(c.Request, "cookies")
+	err := cookies.Save(c.Request, c.W)
 	if err != nil {
 		log.Println("Can't save session: %v", err)
 	}
+
+	// TODO: filestystem store
 }
 
 func (this *Controller) End(c web.C) {
@@ -29,6 +27,10 @@ func (this *Controller) End(c web.C) {
 func (this *Controller) Redirect(c web.C, urlStr string, code int) {
 	this.SaveSession(c)
 	http.Redirect(c.W, c.Request, urlStr, code)
+}
+
+func (this *Controller) BeforeRender(c web.C) {
+
 }
 
 func (this *Controller) Render(c web.C, view string, args RenderArgs, status int) {
@@ -42,6 +44,9 @@ func (this *Controller) Render(c web.C, view string, args RenderArgs, status int
 	} else {
 		data = args
 	}
+
+	data["Env"] = c.Env
+
 	r.RenderHTML(c.W,
 		status, view, data,
 		HTMLOptions{Layout: this.Layout})

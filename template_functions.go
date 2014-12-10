@@ -2,7 +2,7 @@ package gopi
 
 import (
 	"html/template"
-	"log"
+	//"log"
 	//"unsafe"
 	//"net/http"
 )
@@ -39,7 +39,6 @@ var TemplateFunctions = template.FuncMap{
 				return "LIST VIEW ERROR:\n" + template.HTML(err.Error()) + "\n\n"
 			}
 			//html = html + *(*string)(unsafe.Pointer(&out))
-			log.Println(out.String())
 			html = html + out.String()
 		}
 
