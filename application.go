@@ -11,7 +11,8 @@ import (
 
 	"log"
 	"net/http"
-
+	
+	"github.com/gorilla/context"
 	"github.com/ludmiloff/gopi/bind"
 	"github.com/ludmiloff/gopi/graceful"
 	"github.com/ludmiloff/gopi/web"
@@ -82,7 +83,9 @@ func CreateAppliction() *Application {
 	// Defaults
 	app.DefaultMux = web.New()
 	app.DefaultMux.Use(middleware.RequestID)
-	app.DefaultMux.Use(middleware.Logger)
+	if app.Config.GetDefault("general.logger", true).(bool) {
+		app.DefaultMux.Use(middleware.Logger)
+	}
 	app.DefaultMux.Use(middleware.Recoverer)
 	app.DefaultMux.Use(middleware.AutomaticOptions)
 	app.DefaultMux.Compile()
@@ -92,10 +95,12 @@ func CreateAppliction() *Application {
 
 	// Static files
 	// Setup static files
-	static := web.New()
-	publicPath := app.Config.Get("general.public_path").(string)
-	static.Get("/assets/*", http.StripPrefix("/assets/", http.FileServer(http.Dir(publicPath))))
-	http.Handle("/assets/", static)
+	if app.Config.GetDefault("general.handle_assets", true).(bool) {
+		static := web.New()
+		publicPath := app.Config.Get("general.public_path").(string)
+		static.Get("/assets/*", http.StripPrefix("/assets/", http.FileServer(http.Dir(publicPath))))
+		http.Handle("/assets/", static)
+	}
 
 	// Template renderer
 	app.InitRender(template.FuncMap{})
