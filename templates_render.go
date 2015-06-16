@@ -5,12 +5,13 @@ import (
 	//"fmt"
 	"html/template"
 	"io/ioutil"
-	"log"
+	//"log"
 	"net/http"
 	//"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"encoding/json"
 )
 
 const (
@@ -237,20 +238,27 @@ func (r *Render) compileTemplates() {
 // }
 
 // JSON marshals the given interface object and writes the JSON response.
-// func (r *Render) JSON(status int, v interface{}) {
-// 	head := Head{
-// 		ContentType: ContentJSON + r.compiledCharset,
-// 		Status:      status,
-// 	}
+ func (r *Render) JSON(w http.ResponseWriter, status int, v interface{}) {
+ 	head := Head{
+ 		ContentType: ContentJSON + r.compiledCharset,
+ 		Status:      status,
+	}
 
-// 	j := JSON{
-// 		Head:   head,
-// 		Indent: r.opt.IndentJSON,
-// 		Prefix: r.opt.PrefixJSON,
-// 	}
+	 var out []byte
+	 var err error
+	 if r.opt.IndentJSON {
+		 out, err = json.MarshalIndent(v, "", "  ")
+	 } else {
+		 out, err = json.Marshal(v)
+	 }
+	 if err != nil {
+		 http.Error(w, err.Error(), http.StatusInternalServerError)
+		 return
+	 }
 
-// 	r.Render(j, v)
-// }
+	 head.Write(w)
+	 w.Write(out)
+}
 
 // Data writes out the raw bytes as binary data.
 // func (r *Render) Data(w http.ResponseWriter, status int, v []byte) {
@@ -277,7 +285,7 @@ func (r *Render) RenderHTML(w http.ResponseWriter, status int, name string, bind
 
 	// Assign a layout if there is one.
 	if len(opt.Layout) > 0 {
-		log.Println("USE YIELD")
+		//log.Println("USE YIELD")
 		r.addYield(name, binding)
 		name = opt.Layout
 	}

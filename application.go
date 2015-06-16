@@ -4,7 +4,6 @@ package gopi
 
 import (
 	"flag"
-	"github.com/coopernurse/gorp"
 	"github.com/gorilla/sessions"
 	"github.com/pelletier/go-toml"
 	"html/template"
@@ -19,10 +18,14 @@ import (
 	"github.com/ludmiloff/gopi/web/middleware"
 )
 
+type ApplicationVirtualMethods interface {
+	Init()
+}
+
 type Application struct {
+	ApplicationVirtualMethods
 	DefaultMux  *web.Mux
 	Config      *toml.TomlTree
-	DB          *gorp.DbMap
 	Session     *sessions.FilesystemStore
 	CookieStore *sessions.CookieStore
 	Render      *Render
@@ -39,20 +42,11 @@ type Application struct {
 
 var App *Application
 
-func CreateAppliction() *Application {
-	app := &Application{}
+func CreateAppliction(virt ApplicationVirtualMethods) *Application {
+	app := &Application{ApplicationVirtualMethods: virt}
 
 	if !flag.Parsed() {
 		flag.Parse()
-	}
-
-	filename := flag.String("config", "config.toml", "Path to configuration file")
-
-	var err error
-
-	app.Config, err = toml.LoadFile(*filename)
-	if err != nil {
-		log.Fatalf("Config load failed: %s\n", err)
 	}
 
 	defaultBind := ":8000"
@@ -80,53 +74,68 @@ func CreateAppliction() *Application {
 		log.SetFlags(fl | log.Lmicroseconds)
 	}
 
-	// Defaults
-	app.DefaultMux = web.New()
-	app.DefaultMux.Use(middleware.RequestID)
-	if app.Config.GetDefault("general.logger", true).(bool) {
-		app.DefaultMux.Use(middleware.Logger)
+	app.initInternal()
+
+	App = app
+	return app
+}
+
+func (this *Application) initInternal() {
+
+	filename := flag.String("config", "config.toml", "Path to configuration file")
+
+	var err error
+
+	this.Config, err = toml.LoadFile(*filename)
+	if err != nil {
+		log.Fatalf("Config load failed: %s\n", err)
 	}
-	app.DefaultMux.Use(middleware.Recoverer)
-	app.DefaultMux.Use(middleware.AutomaticOptions)
-	app.DefaultMux.Compile()
+
+	// Defaults
+	this.DefaultMux = web.New()
+	this.DefaultMux.Use(middleware.RequestID)
+	if this.Config.GetDefault("general.logger", true).(bool) {
+		this.DefaultMux.Use(middleware.Logger)
+	}
+	this.DefaultMux.Use(middleware.Recoverer)
+	this.DefaultMux.Use(middleware.AutomaticOptions)
+	this.DefaultMux.Compile()
 	// Install our handler at the root of the standard net/http default mux.
 	// This allows packages like expvar to continue working as expected.
-	http.Handle("/", app.DefaultMux)
+	http.Handle("/", this.DefaultMux)
 
 	// Static files
 	// Setup static files
-	if app.Config.GetDefault("general.handle_assets", true).(bool) {
+	if this.Config.GetDefault("general.handle_assets", true).(bool) {
 		static := web.New()
-		publicPath := app.Config.Get("general.public_path").(string)
+		publicPath := this.Config.Get("general.public_path").(string)
 		static.Get("/assets/*", http.StripPrefix("/assets/", http.FileServer(http.Dir(publicPath))))
 		http.Handle("/assets/", static)
 	}
 
 	// Template renderer
-	app.InitRender(template.FuncMap{})
-
-	// Database
-	app.InitDB()
+	this.InitRender(template.FuncMap{})
 
 	// Cookies
-	app.InitCookies()
+	this.InitCookies()
 
 	// File system session store
-	app.InitSessionStore()
+	this.InitSessionStore()
 
 	// Parameters
-	app.Params = map[string]string{}
+	this.Params = map[string]string{}
 
 	graceful.HandleSignals()
 	bind.Ready()
-	graceful.PreHook(app.AboutToStop)
+	graceful.PreHook(this.AboutToStop)
 	graceful.PostHook(func() { log.Printf("Gopi stopped") })
 
 	// Use Middleware
-	app.Use(app.ApplySessions)
+	this.Use(this.ApplySessions)
 
-	App = app
-	return app
+	log.Printf("internal init done ...")
+
+	this.Init()
 }
 
 // Start starts Gopi using reasonable defaults.
