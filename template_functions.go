@@ -27,7 +27,7 @@ var TemplateFunctions = template.FuncMap{
 	},
 
 	"param": func(key string) template.HTML {
-		if val, ok := App.Params[key]; ok {
+		if val, ok := app.Params[key]; ok {
 			return template.HTML(template.HTMLEscapeString(val))
 		} else {
 			return ""
@@ -37,7 +37,7 @@ var TemplateFunctions = template.FuncMap{
 	"ListView": func(view string, list []interface{}) template.HTML {
 		var html bytes.Buffer
 		for index, item := range list {
-			out, err := App.Render.execute(view, RenderArgs{"item": item, "index": index})
+			out, err := app.Render.execute(view, RenderArgs{"item": item, "index": index})
 			if err != nil {
 				return "LIST VIEW ERROR:\n" + template.HTML(err.Error()) + "\n\n"
 			}

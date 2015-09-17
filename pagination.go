@@ -15,8 +15,8 @@ const (
 
 type Pagination struct {
 	current				int			// current page
-	total_items 		int			// total number of items
-	num_pages 			int 		// overall number of pages
+	total_items			int			// total number of items
+	num_pages			int 		// overall number of pages
 	per_page			int			// max number of items on single page
 	max					int			// widget maximum pages
 	css					string		// widget css class
