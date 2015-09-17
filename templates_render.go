@@ -33,6 +33,7 @@ const (
 	defaultCharset = "UTF-8"
 )
 
+
 type RenderArgs map[string]interface{}
 
 // Delims represents a set of Left and Right delimiters for HTML template rendering.

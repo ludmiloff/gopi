@@ -24,6 +24,7 @@ type ApplicationVirtualMethods interface {
 
 type Application struct {
 	ApplicationVirtualMethods
+	Name		string
 	DefaultMux  *web.Mux
 	Config      *toml.TomlTree
 	Session     *sessions.FilesystemStore
@@ -40,11 +41,13 @@ type Application struct {
 	AuthenticateUser func(username, password string)
 }
 
-var App *Application
+var app *Application
 
-func CreateAppliction(virt ApplicationVirtualMethods) *Application {
-	app := &Application{ApplicationVirtualMethods: virt}
+//func CreateAppliction(virt ApplicationVirtualMethods) *Application {
+func CreateAppliction(name string) *Application {
 
+	app = &Application{Name: name}
+	
 	if !flag.Parsed() {
 		flag.Parse()
 	}
@@ -76,7 +79,6 @@ func CreateAppliction(virt ApplicationVirtualMethods) *Application {
 
 	app.initInternal()
 
-	App = app
 	return app
 }
 
@@ -134,12 +136,13 @@ func (this *Application) initInternal() {
 	this.Use(this.ApplySessions)
 
 	log.Printf("internal init done ...")
-
-	this.Init()
 }
 
 // Start starts Gopi using reasonable defaults.
 func (this *Application) Start() {
+
+	// User defined initialization
+	this.Init()
 
 	// Finalize middleware stack
 	this.Use(context.ClearHandler)

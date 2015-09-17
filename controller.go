@@ -42,7 +42,7 @@ func (this *Controller) Render(c web.C, view string, args RenderArgs, status int
 
 	this.SaveSession(c)
 
-	var r *Render = App.Render
+	var r *Render = app.Render
 	var data RenderArgs
 	if args == nil {
 		data = RenderArgs{}
@@ -59,6 +59,6 @@ func (this *Controller) Render(c web.C, view string, args RenderArgs, status int
 
 func (this *Controller) JSON(c web.C, v interface{}) {
 	this.SaveSession(c)
-	var r *Render = App.Render
+	var r *Render = app.Render
 	r.JSON(c.W, http.StatusOK, v)
 }

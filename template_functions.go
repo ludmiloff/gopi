@@ -6,6 +6,8 @@ import (
 	//"unsafe"
 	//"net/http"
 	"time"
+	"fmt"
+	"bytes"
 )
 
 // Included helper functions for use when rendering html.
@@ -33,17 +35,29 @@ var TemplateFunctions = template.FuncMap{
 	},
 
 	"ListView": func(view string, list []interface{}) template.HTML {
-		var html = ""
+		var html bytes.Buffer
 		for index, item := range list {
 			out, err := App.Render.execute(view, RenderArgs{"item": item, "index": index})
 			if err != nil {
 				return "LIST VIEW ERROR:\n" + template.HTML(err.Error()) + "\n\n"
 			}
 
-			html = html + out.String()
+			html.Write(out.Bytes())
 		}
 
-		return template.HTML(html)
+		return template.HTML(html.String())
+	},
+
+	"Pager": func(pagination *Pagination, cssclass string) template.HTML {
+		if cssclass != "" {
+			pagination.css = cssclass
+		}
+
+		return pagination.Html()
+	},
+
+	"PagerSEO": func(pagination *Pagination) template.HTML {
+		return pagination.SEO()
 	},
 
 	"raw": func(text string) template.HTML {
@@ -61,5 +75,23 @@ var TemplateFunctions = template.FuncMap{
 	},
 	"datetime": func(date time.Time) string {
 		return date.Format(DateTimeFormat)
+	},
+
+	//
+	"yield": func() (string, error) {
+		return "", fmt.Errorf("yield called with no layout defined")
+	},
+}
+
+// Included helper functions for use when rendering HTML.
+var helperFuncs = template.FuncMap{
+	"yield": func() (string, error) {
+		return "", fmt.Errorf("yield called with no layout defined")
+	},
+	"block": func() (string, error) {
+		return "", fmt.Errorf("block called with no layout defined")
+	},
+	"current": func() (string, error) {
+		return "", nil
 	},
 }
