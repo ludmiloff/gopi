@@ -26,6 +26,11 @@ var TemplateFunctions = template.FuncMap{
 		return nil
 	},
 
+	"slice": func(renderArgs map[string]interface{}, key string, value ...interface{}) interface{} {
+		renderArgs[key] = value
+		return nil
+	},
+
 	"param": func(key string) template.HTML {
 		if val, ok := app.Params[key]; ok {
 			return template.HTML(template.HTMLEscapeString(val))
@@ -64,6 +69,8 @@ var TemplateFunctions = template.FuncMap{
 		return template.HTML(text)
 	},
 
+//	"option" : func(values []interface{})
+
 	// Year
 	"year": func() int {
 		return time.Now().Year();
@@ -75,6 +82,34 @@ var TemplateFunctions = template.FuncMap{
 	},
 	"datetime": func(date time.Time) string {
 		return date.Format(DateTimeFormat)
+	},
+
+	//
+
+	"empty": func(text string) bool {
+		return len(text) == 0
+	},
+
+	"not_empty": func(text string) bool {
+		return len(text) > 0
+	},
+
+	// Forms
+
+	"formError": func(field string, errorsMap map[string]string) template.HTML {
+		if value, found := errorsMap[field]; found {
+			return template.HTML("<div class=\"error\">"+value+"</div>")
+		} else {
+			return template.HTML("")
+		}
+	},
+
+	"hasError": func(field string, errorsMap map[string]string) template.HTML {
+		if _, found := errorsMap[field]; found {
+			return template.HTML("has-error")
+		} else {
+			return template.HTML("")
+		}
 	},
 
 	//

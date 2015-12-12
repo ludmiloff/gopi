@@ -29,9 +29,10 @@ type Pagination struct {
 	Page_var			string		// page variable, used in url
 	next_to_current		string
 	prev_to_current		string
+	prefix				string
 }
 
-func NewDefaultPagination(total_items, per_page int, current int, url *url.URL) *Pagination {
+func NewDefaultPagination(total_items, per_page int, current int, url *url.URL, prefix string) *Pagination {
 	max := PAGER_MAX_PAGES // default
 	n := int(math.Ceil(float64(total_items) / float64(per_page)))
 	//n = int(math.Min(float64(n), float64(max)))
@@ -48,6 +49,7 @@ func NewDefaultPagination(total_items, per_page int, current int, url *url.URL) 
 		Prev: 			"<<",
 		Next: 			">>",
 		Page_var: 		"page",
+		prefix:			prefix,
 	}
 	if total_items > per_page {
 		p.excludeParamFromUrl(url, "page")
@@ -87,10 +89,10 @@ func (this *Pagination) excludeParamFromUrl(url *url.URL, page string) {
 	query.Del(page)
 	encoded := query.Encode()
 	if encoded != "" {
-		this.first_url = url.Path + "?" + encoded
+		this.first_url = this.prefix + url.Path + "?" + encoded
 		this.url = this.first_url + "&" + this.Page_var + "="
 	} else {
-		this.first_url = url.Path
+		this.first_url = this.prefix + url.Path
 		this.url = this.first_url + "?" + this.Page_var + "="
 	}
 }

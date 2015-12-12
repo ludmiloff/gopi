@@ -23,7 +23,7 @@ func (this *Controller) SaveSession(c web.C) {
 //		log.Println("Can't save session: %v", err)
 //	}
 //
-//	// TODO: filestystem store
+//	// TODO: file system store
 }
 
 func (this *Controller) End(c web.C) {

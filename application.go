@@ -118,11 +118,12 @@ func (this *Application) initInternal() {
 	// Template renderer
 	this.InitRender(template.FuncMap{})
 
-	// Cookies
-	this.InitCookies()
-
-	// File system session store
-	this.InitSessionStore()
+//	if (this.Config.GetDefault("cookies.use_cookies", false).(bool)) {
+//		// Cookies
+//		this.InitCookies()
+//		// Use Middleware
+//		this.Use(this.ApplyCookies)
+//	}
 
 	// Parameters
 	this.Params = map[string]string{}
@@ -131,9 +132,6 @@ func (this *Application) initInternal() {
 	bind.Ready()
 	graceful.PreHook(this.AboutToStop)
 	graceful.PostHook(func() { log.Printf("Gopi stopped") })
-
-	// Use Middleware
-	this.Use(this.ApplySessions)
 
 	log.Printf("internal init done ...")
 }
