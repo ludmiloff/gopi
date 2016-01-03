@@ -1,4 +1,4 @@
-// +build !windows,!appengine
+// +build !windows
 
 package graceful
 
@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	// This is a little unfortunate: gopi/bind already knows whether we're
+	// This is a little unfortunate: goji/bind already knows whether we're
 	// running under einhorn, but we don't want to introduce a dependency
 	// between the two packages. Since the check is short enough, inlining
 	// it here seems "fine."
