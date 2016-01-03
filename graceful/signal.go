@@ -97,13 +97,16 @@ func waitForSignal() {
 	for _, f := range prehooks {
 		f()
 	}
+	println("prehooks done")
 
 	close(kill)
+	println("waiting wg")
 	wg.Wait()
 
 	for _, f := range posthooks {
 		f()
 	}
+	println("posthooks done")
 
 	close(wait)
 }
