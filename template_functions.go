@@ -39,6 +39,17 @@ var TemplateFunctions = template.FuncMap{
 		}
 	},
 
+	"config": func(key string) bool {
+		if val, ok := app.Params[key]; ok {
+			if val == "yes" {
+				return true
+			} else {
+				return false
+			}
+		}
+		return false
+	},
+
 	"ListView": func(view string, list []interface{}) template.HTML {
 		var html bytes.Buffer
 		for index, item := range list {
